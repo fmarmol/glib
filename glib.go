@@ -5,60 +5,6 @@ import (
 	"image/color"
 )
 
-type Pixel struct{ color.NRGBA }
-
-func (p Pixel) RGBA() (r, g, b, a uint32) {
-	return p.NRGBA.RGBA()
-}
-
-//go:inline
-func (p *Pixel) R() uint8 {
-	return p.NRGBA.R
-}
-
-//go:inline
-func (p *Pixel) G() uint8 {
-	return p.NRGBA.G
-}
-
-//go:inline
-func (p *Pixel) B() uint8 {
-	return p.NRGBA.B
-}
-
-//go:inline
-func (p *Pixel) A() uint8 {
-	return p.NRGBA.A
-}
-
-//go:inline
-func (p *Pixel) SetR(v uint8) *Pixel {
-	p.NRGBA.R = v
-	return p
-}
-
-//go:inline
-func (p *Pixel) SetG(v uint8) *Pixel {
-	p.NRGBA.G = v
-	return p
-}
-
-//go:inline
-func (p *Pixel) SetB(v uint8) *Pixel {
-	p.NRGBA.B = v
-	return p
-}
-
-//go:inline
-func (p *Pixel) SetA(v uint8) *Pixel {
-	p.NRGBA.A = v
-	return p
-}
-
-func NewPixel(r, g, b, a uint8) Pixel {
-	return Pixel{NRGBA: color.NRGBA{r, g, b, a}}
-}
-
 type Image struct {
 	indexRef int // for subimage
 	stride   int // for subimage
@@ -67,8 +13,23 @@ type Image struct {
 	pixels   []Pixel
 }
 
-func NewImage(w, h int) Image {
-	return Image{
+func NewImageFromImage(img image.Image) *Image {
+	bounds := img.Bounds()
+	w := bounds.Dx()
+	h := bounds.Dy()
+
+	ret := NewImage(w, h)
+
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			ret.Set(x, y, img.At(x, y))
+		}
+	}
+	return ret
+}
+
+func NewImage(w, h int) *Image {
+	return &Image{
 		pixels: make([]Pixel, w*h, w*h),
 		width:  w,
 		height: h,
@@ -93,8 +54,8 @@ func (i *Image) Fill(c color.Color) {
 	}
 }
 
-func (i *Image) SubImage(x, y, w, h int) Image {
-	r := Image{
+func (i *Image) SubImage(x, y, w, h int) *Image {
+	r := &Image{
 		pixels:   i.pixels,
 		width:    w,
 		height:   h,

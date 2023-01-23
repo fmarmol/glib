@@ -2,6 +2,7 @@ package glib
 
 import (
 	"image/png"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -13,8 +14,8 @@ func TestPng(t *testing.T) {
 	assert.NoError(t, err)
 	defer fd.Close()
 
-	w := 10000
-	h := 10000
+	w := 1000
+	h := 1000
 
 	img := NewImage(w, h)
 	img.Fill(NewPixel(255, 0, 0, 255))
@@ -22,4 +23,24 @@ func TestPng(t *testing.T) {
 	sub.Fill(NewPixel(0, 255, 0, 255))
 	err = png.Encode(fd, img)
 	assert.NoError(t, err)
+
+	fd.Close()
+	fd, err = os.Open("file.png")
+	assert.NoError(t, err)
+	imgCopy, err := png.Decode(fd)
+	assert.NoError(t, err)
+
+	img2 := NewImageFromImage(imgCopy)
+	fd2, err := os.Create("file2.png")
+	assert.NoError(t, err)
+	defer fd2.Close()
+	err = png.Encode(fd2, img2)
+	assert.NoError(t, err)
+
+	data, err := ioutil.ReadFile("file.png")
+	assert.NoError(t, err)
+	data2, err := ioutil.ReadFile("file2.png")
+	assert.NoError(t, err)
+	assert.Equal(t, data, data2)
+
 }
