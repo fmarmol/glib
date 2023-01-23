@@ -1,6 +1,7 @@
 package glib
 
 import (
+	"image"
 	"image/color"
 	"testing"
 
@@ -29,4 +30,8 @@ func TestPixel(t *testing.T) {
 
 func TestPixelImplementColor(t *testing.T) {
 	var _ color.Color = NewPixel(1, 2, 3, 4)
+}
+
+func TestImageImplementImage(t *testing.T) {
+	var _ image.Image = NewImage(10, 10)
 }

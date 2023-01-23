@@ -21,7 +21,7 @@ func TestPng(t *testing.T) {
 	img.Fill(NewPixel(255, 0, 0, 255))
 	sub := img.SubImage(25, 25, w-50, h-50)
 	sub.Fill(NewPixel(0, 255, 0, 255))
-	err = png.Encode(fd, img)
+	err = img.ToPng(fd)
 	assert.NoError(t, err)
 
 	fd.Close()
@@ -34,7 +34,7 @@ func TestPng(t *testing.T) {
 	fd2, err := os.Create("file2.png")
 	assert.NoError(t, err)
 	defer fd2.Close()
-	err = png.Encode(fd2, img2)
+	err = img2.ToPng(fd2)
 	assert.NoError(t, err)
 
 	data, err := ioutil.ReadFile("file.png")

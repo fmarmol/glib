@@ -3,6 +3,8 @@ package glib
 import (
 	"image"
 	"image/color"
+	"image/png"
+	"io"
 )
 
 type Image struct {
@@ -65,15 +67,21 @@ func (i *Image) SubImage(x, y, w, h int) *Image {
 	return r
 }
 
-func (i Image) Bounds() image.Rectangle {
+// implement image.Image
+
+func (i *Image) Bounds() image.Rectangle {
 	return image.Rect(0, 0, i.width, i.height)
 }
 
-func (i Image) ColorModel() color.Model {
+func (i *Image) ColorModel() color.Model {
 	return color.NRGBAModel
 }
 
-func (i Image) At(x, y int) color.Color {
+func (i *Image) At(x, y int) color.Color {
 	index := i.indexRef + y*i.stride + x
 	return i.pixels[index]
+}
+
+func (i *Image) ToPng(w io.Writer) error {
+	return png.Encode(w, i)
 }
