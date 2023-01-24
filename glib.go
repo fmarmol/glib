@@ -54,12 +54,21 @@ func (i *Image) Set(x, y int, c color.Color) {
 	index := i.GetIndex(x, y)
 
 	// we store color as non-alpha-premultiplied
-	res := color.RGBAModel.Convert(c)
-	res2 := res.(color.RGBA)
-	i.pixels[index] = res2.R
-	i.pixels[index+1] = res2.G
-	i.pixels[index+2] = res2.B
-	i.pixels[index+3] = res2.A
+	switch v := c.(type) {
+	case color.RGBA:
+		i.pixels[index] = v.R
+		i.pixels[index+1] = v.G
+		i.pixels[index+2] = v.B
+		i.pixels[index+3] = v.A
+	default:
+		res := color.RGBAModel.Convert(c)
+		res2 := res.(color.RGBA)
+		i.pixels[index] = res2.R
+		i.pixels[index+1] = res2.G
+		i.pixels[index+2] = res2.B
+		i.pixels[index+3] = res2.A
+
+	}
 }
 
 func (i *Image) Fill(c color.Color) {
