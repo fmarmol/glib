@@ -12,7 +12,11 @@ type Image struct {
 	stride   int // for subimage
 	width    int
 	height   int
-	pixels   []Pixel
+	pixels   []byte
+}
+
+func (i *Image) Pixels() []byte {
+	return i.pixels
 }
 
 func NewImageFromImage(img image.Image) *Image {
@@ -32,20 +36,30 @@ func NewImageFromImage(img image.Image) *Image {
 
 func NewImage(w, h int) *Image {
 	return &Image{
-		pixels: make([]Pixel, w*h, w*h),
+		pixels: make([]byte, 4*w*h, 4*w*h),
 		width:  w,
 		height: h,
 		stride: w,
 	}
 }
 
+//go:inline
+func (i *Image) GetIndex(x, y int) int {
+	index := i.indexRef + y*i.stride*4 + x*4
+	return index
+
+}
+
 func (i *Image) Set(x, y int, c color.Color) {
-	index := i.indexRef + y*i.stride + x
-	r, g, b, a := c.RGBA()
-	i.pixels[index].SetR(uint8(r))
-	i.pixels[index].SetG(uint8(g))
-	i.pixels[index].SetB(uint8(b))
-	i.pixels[index].SetA(uint8(a))
+	index := i.GetIndex(x, y)
+
+	// we store color as non-alpha-premultiplied
+	res := color.RGBAModel.Convert(c)
+	res2 := res.(color.RGBA)
+	i.pixels[index] = res2.R
+	i.pixels[index+1] = res2.G
+	i.pixels[index+2] = res2.B
+	i.pixels[index+3] = res2.A
 }
 
 func (i *Image) Fill(c color.Color) {
@@ -62,7 +76,7 @@ func (i *Image) SubImage(x, y, w, h int) *Image {
 		width:    w,
 		height:   h,
 		stride:   i.stride,
-		indexRef: i.indexRef + y*i.stride + x,
+		indexRef: i.GetIndex(x, y),
 	}
 	return r
 }
@@ -74,12 +88,17 @@ func (i *Image) Bounds() image.Rectangle {
 }
 
 func (i *Image) ColorModel() color.Model {
-	return color.NRGBAModel
+	return color.RGBAModel
 }
 
 func (i *Image) At(x, y int) color.Color {
-	index := i.indexRef + y*i.stride + x
-	return i.pixels[index]
+	index := i.GetIndex(x, y)
+	return color.RGBA{
+		R: i.pixels[index],
+		G: i.pixels[index+1],
+		B: i.pixels[index+2],
+		A: i.pixels[index+3],
+	}
 }
 
 func (i *Image) ToPng(w io.Writer) error {

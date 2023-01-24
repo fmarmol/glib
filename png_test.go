@@ -1,6 +1,7 @@
 package glib
 
 import (
+	"image/color"
 	"image/png"
 	"io/ioutil"
 	"os"
@@ -18,9 +19,9 @@ func TestPng(t *testing.T) {
 	h := 1000
 
 	img := NewImage(w, h)
-	img.Fill(NewPixel(255, 0, 0, 255))
+	img.Fill(color.RGBA{255, 0, 0, 255})
 	sub := img.SubImage(25, 25, w-50, h-50)
-	sub.Fill(NewPixel(0, 255, 0, 255))
+	sub.Fill(color.RGBA{0, 255, 0, 255})
 	err = img.ToPng(fd)
 	assert.NoError(t, err)
 
@@ -42,5 +43,4 @@ func TestPng(t *testing.T) {
 	data2, err := ioutil.ReadFile("file2.png")
 	assert.NoError(t, err)
 	assert.Equal(t, data, data2)
-
 }
