@@ -71,12 +71,13 @@ func (i *Image) Set(x, y int, c color.Color) {
 	}
 }
 
-func (i *Image) Fill(c color.Color) {
+func (i *Image) Fill(c color.Color) *Image {
 	for x := 0; x < i.width; x++ {
 		for y := 0; y < i.height; y++ {
 			i.Set(x, y, c)
 		}
 	}
+	return i
 }
 
 func (i *Image) SubImage(x, y, w, h int) *Image {
