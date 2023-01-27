@@ -50,6 +50,24 @@ func (i *Image) GetIndex(x, y int) int {
 
 }
 
+func (i *Image) DrawHLine(x0, x1, y int, c color.Color) {
+	if x0 > x1 {
+		x0, x1 = x1, x0
+	}
+	for x := x0; x <= x1; x++ {
+		i.Set(x, y, c)
+	}
+}
+
+func (i *Image) DrawVLine(y0, y1, x int, c color.Color) {
+	if y0 > y1 {
+		y0, y1 = y1, y0
+	}
+	for y := y0; y <= y1; y++ {
+		i.Set(x, y, c)
+	}
+}
+
 func (i *Image) Set(x, y int, c color.Color) {
 	index := i.GetIndex(x, y)
 

@@ -22,6 +22,8 @@ func TestPng(t *testing.T) {
 	img.Fill(color.RGBA{255, 0, 0, 255})
 	sub := img.SubImage(25, 25, w-50, h-50)
 	sub.Fill(color.RGBA{0, 255, 0, 255})
+	img.DrawHLine(300, 600, 400, color.Black)
+	img.DrawVLine(300, 600, 400, color.White)
 	err = img.ToPng(fd)
 	assert.NoError(t, err)
 
