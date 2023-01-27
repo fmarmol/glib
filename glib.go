@@ -98,6 +98,12 @@ func (i *Image) Fill(c color.Color) *Image {
 	return i
 }
 
+func (i *Image) SubImageFromRect(rect image.Rectangle) *Image {
+	w := rect.Dx()
+	h := rect.Dy()
+	return i.SubImage(rect.Min.X, rect.Min.Y, w, h)
+}
+
 func (i *Image) SubImage(x, y, w, h int) *Image {
 	r := &Image{
 		pixels:   i.pixels,
