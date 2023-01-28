@@ -1,6 +1,7 @@
 package glib
 
 import (
+	"github.com/disintegration/imaging"
 	"image"
 	"image/color"
 	"image/png"
@@ -9,10 +10,9 @@ import (
 )
 
 type Image struct {
-	indexRef int // for subimage
-	stride   int // for subimage
-	width    int
-	height   int
+	indexRef int             // for subimage
+	stride   int             // for subimage
+	rect     image.Rectangle // rectangle of the image
 	pixels   []byte
 }
 
@@ -38,8 +38,7 @@ func NewImageFromImage(img image.Image) *Image {
 func NewImage(w, h int) *Image {
 	return &Image{
 		pixels: make([]byte, 4*w*h, 4*w*h),
-		width:  w,
-		height: h,
+		rect:   image.Rect(0, 0, w, h),
 		stride: w,
 	}
 }
@@ -91,8 +90,10 @@ func (i *Image) Set(x, y int, c color.Color) {
 }
 
 func (i *Image) Fill(c color.Color) *Image {
-	for x := 0; x < i.width; x++ {
-		for y := 0; y < i.height; y++ {
+	w := i.rect.Dx()
+	h := i.rect.Dy()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
 			i.Set(x, y, c)
 		}
 	}
@@ -108,8 +109,7 @@ func (i *Image) SubImageFromRect(rect image.Rectangle) *Image {
 func (i *Image) SubImage(x, y, w, h int) *Image {
 	r := &Image{
 		pixels:   i.pixels,
-		width:    w,
-		height:   h,
+		rect:     image.Rect(x, y, x+w, y+h),
 		stride:   i.stride,
 		indexRef: i.GetIndex(x, y),
 	}
@@ -119,7 +119,7 @@ func (i *Image) SubImage(x, y, w, h int) *Image {
 // implement image.Image
 
 func (i *Image) Bounds() image.Rectangle {
-	return image.Rect(0, 0, i.width, i.height)
+	return i.rect
 }
 
 func (i *Image) ColorModel() color.Model {
@@ -134,6 +134,11 @@ func (i *Image) At(x, y int) color.Color {
 		B: i.pixels[index+2],
 		A: i.pixels[index+3],
 	}
+}
+
+func (i *Image) Rotate(angle float64, bgColor color.Color) {
+	res := imaging.Rotate(i, angle, bgColor)
+	*i = *NewImageFromImage(res)
 }
 
 func (i *Image) ToPng(w io.Writer) error {

@@ -11,9 +11,6 @@ import (
 )
 
 func TestPng(t *testing.T) {
-	fd, err := os.Create("file.png")
-	assert.NoError(t, err)
-	defer fd.Close()
 
 	w := 1000
 	h := 1000
@@ -24,11 +21,15 @@ func TestPng(t *testing.T) {
 	sub.Fill(color.RGBA{0, 255, 0, 255})
 	img.DrawHLine(300, 600, 400, color.Black)
 	img.DrawVLine(300, 600, 400, color.White)
-	err = img.ToPng(fd)
+
+	err := img.ToPngFile("file.png")
 	assert.NoError(t, err)
 
-	fd.Close()
-	fd, err = os.Open("file.png")
+	img.Rotate(45, RANDOM())
+	err = img.ToPngFile("file_rotated.png")
+	assert.NoError(t, err)
+
+	fd, err := os.Open("file.png")
 	assert.NoError(t, err)
 	imgCopy, err := png.Decode(fd)
 	assert.NoError(t, err)
