@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+	"os"
 )
 
 type Image struct {
@@ -137,4 +138,18 @@ func (i *Image) At(x, y int) color.Color {
 
 func (i *Image) ToPng(w io.Writer) error {
 	return png.Encode(w, i)
+}
+
+func (i *Image) ToPngFile(path string) error {
+	fd, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	err = i.ToPng(fd)
+	if err != nil {
+		fd.Close()
+		return err
+	}
+	fd.Close()
+	return nil
 }
