@@ -20,6 +20,18 @@ func (i *Image) Pixels() []byte {
 	return i.pixels
 }
 
+func (i *Image) Translate(dx, dy int) *Image {
+	i.rect.Min.X += dx
+	i.rect.Max.X += dx
+	i.rect.Min.Y += dy
+	i.rect.Max.Y += dy
+	return i
+}
+
+func (i *Image) Center() (int, int) {
+	return (i.rect.Max.X + i.rect.Min.X) / 2, (i.rect.Max.Y + i.rect.Min.Y) / 2
+}
+
 func NewImageFromImage(img image.Image) *Image {
 	bounds := img.Bounds()
 	w := bounds.Dx()
