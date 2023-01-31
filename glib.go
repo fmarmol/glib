@@ -1,12 +1,14 @@
 package glib
 
 import (
-	"github.com/disintegration/imaging"
 	"image"
 	"image/color"
 	"image/png"
 	"io"
 	"os"
+	"unsafe"
+
+	"github.com/disintegration/imaging"
 )
 
 type Image struct {
@@ -18,6 +20,10 @@ type Image struct {
 
 func (i *Image) Pixels() []byte {
 	return i.pixels
+}
+
+func (i *Image) PixelsU32() []uint32 {
+	return *(*[]uint32)(unsafe.Pointer(&i.pixels))
 }
 
 func (i *Image) Translate(dx, dy int) *Image {
