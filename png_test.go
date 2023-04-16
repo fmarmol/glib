@@ -46,4 +46,6 @@ func TestPng(t *testing.T) {
 	data2, err := ioutil.ReadFile("file2.png")
 	assert.NoError(t, err)
 	assert.Equal(t, data, data2)
+
+	_ = NewImageFromPngBytes(data)
 }

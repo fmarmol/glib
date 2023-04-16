@@ -1,6 +1,7 @@
 package glib
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 	"image/png"
@@ -53,6 +54,15 @@ func (i *Image) Translate(dx, dy int) *Image {
 
 func (i *Image) Center() (int, int) {
 	return (i.rect.Max.X + i.rect.Min.X) / 2, (i.rect.Max.Y + i.rect.Min.Y) / 2
+}
+
+func NewImageFromPngBytes(data []byte) *Image {
+	buf := bytes.NewBuffer(data)
+	res, err := png.Decode(buf)
+	if err != nil {
+		panic(err)
+	}
+	return NewImageFromImage(res)
 }
 
 func NewImageFromImage(img image.Image) *Image {
