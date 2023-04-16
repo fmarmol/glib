@@ -26,6 +26,23 @@ func (i *Image) PixelsU32() []uint32 {
 	return *(*[]uint32)(unsafe.Pointer(&i.pixels))
 }
 
+func (i *Image) Scale(v float64) *Image {
+	w, h := i.rect.Dx(), i.rect.Dy()
+	ret := NewImage(int(float64(w)*v), int(float64(h)*v))
+	w2, h2 := ret.rect.Dx(), ret.rect.Dy()
+
+	// TODO add 0.5 to be in the center of the pixel
+	for x := 0; x < ret.rect.Dx(); x++ {
+		for y := 0; y < ret.rect.Dy(); y++ {
+			xi := int(float64(x) / float64(w2) * float64(w))
+			yi := int(float64(y) / float64(h2) * float64(h))
+			c := i.At(xi, yi)
+			ret.Set(x, y, c)
+		}
+	}
+	return ret
+}
+
 func (i *Image) Translate(dx, dy int) *Image {
 	i.rect.Min.X += dx
 	i.rect.Max.X += dx
