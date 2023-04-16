@@ -91,14 +91,14 @@ func (i *Image) Set(x, y int, c color.Color) {
 
 	// we store color as non-alpha-premultiplied
 	switch v := c.(type) {
-	case color.RGBA:
+	case color.NRGBA:
 		i.pixels[index] = v.R
 		i.pixels[index+1] = v.G
 		i.pixels[index+2] = v.B
 		i.pixels[index+3] = v.A
 	default:
-		res := color.RGBAModel.Convert(c)
-		res2 := res.(color.RGBA)
+		res := color.NRGBAModel.Convert(c)
+		res2 := res.(color.NRGBA)
 		i.pixels[index] = res2.R
 		i.pixels[index+1] = res2.G
 		i.pixels[index+2] = res2.B
@@ -141,7 +141,7 @@ func (i *Image) Bounds() image.Rectangle {
 }
 
 func (i *Image) ColorModel() color.Model {
-	return color.RGBAModel
+	return color.NRGBAModel
 }
 
 func (i *Image) At(x, y int) color.Color {
