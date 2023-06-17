@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+	"io/ioutil"
 	"os"
 	"unsafe"
 
@@ -25,6 +26,28 @@ func (i *Image) Pixels() []byte {
 
 func (i *Image) PixelsU32() []uint32 {
 	return *(*[]uint32)(unsafe.Pointer(&i.pixels))
+}
+
+func (i *Image) Resize(nw, nh int) *Image {
+	w, h := i.rect.Dx(), i.rect.Dy()
+
+	newImg := NewImage(nw, nh)
+
+	for x := 0; x < nw; x++ {
+		for y := 0; y < nh; y++ {
+
+			xNorm := (float64(x) + 0.5) / float64(nw)
+			yNorm := (float64(y) + 0.5) / float64(nh)
+
+			xSource := int(xNorm * float64(w))
+			ySource := int(yNorm * float64(h))
+			cSource := i.At(xSource, ySource)
+
+			newImg.Set(x, h, cSource)
+
+		}
+	}
+	return newImg
 }
 
 func (i *Image) Scale(v float64) *Image {
@@ -54,6 +77,14 @@ func (i *Image) Translate(dx, dy int) *Image {
 
 func (i *Image) Center() (int, int) {
 	return (i.rect.Max.X + i.rect.Min.X) / 2, (i.rect.Max.Y + i.rect.Min.Y) / 2
+}
+
+func NewImageFromPath(filename string) *Image {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	return NewImageFromPngBytes(data)
 }
 
 func NewImageFromPngBytes(data []byte) *Image {
