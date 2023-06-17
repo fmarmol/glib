@@ -43,7 +43,7 @@ func (i *Image) Resize(nw, nh int) *Image {
 			ySource := int(yNorm * float64(h))
 			cSource := i.At(xSource, ySource)
 
-			newImg.Set(x, h, cSource)
+			newImg.Set(x, y, cSource)
 
 		}
 	}
