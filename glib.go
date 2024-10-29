@@ -20,6 +20,14 @@ type Image struct {
 	pixels   []byte
 }
 
+func (i *Image) Width() int {
+	return i.rect.Dx()
+}
+
+func (i *Image) Heigth() int {
+	return i.rect.Dy()
+}
+
 func (i *Image) Pixels() []byte {
 	return i.pixels
 }
@@ -183,9 +191,19 @@ func (i *Image) SubImageFromRect(rect image.Rectangle) *Image {
 }
 
 func (i *Image) SubImage(x, y, w, h int) *Image {
+
+	dx := x + w
+	if x+w > i.rect.Max.X {
+		dx = i.rect.Max.X
+	}
+	dy := y + h
+	if y+h > i.rect.Max.Y {
+		dy = i.rect.Max.Y
+	}
+
 	r := &Image{
 		pixels:   i.pixels,
-		rect:     image.Rect(x, y, x+w, y+h),
+		rect:     image.Rect(x, y, dx, dy),
 		stride:   i.stride,
 		indexRef: i.GetIndex(x, y),
 	}
