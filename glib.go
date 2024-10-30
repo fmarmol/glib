@@ -122,6 +122,15 @@ func NewImageFromPngBytes(data []byte) *Image {
 	return NewImageFromImage(res)
 }
 
+func NewImageFromBytes(w, h int, pixels []byte) *Image {
+	return &Image{
+		stride: w,                      // for subimage
+		rect:   image.Rect(0, 0, w, h), // rectangle of the image
+		pixels: pixels,
+	}
+
+}
+
 func NewImageFromImage(img image.Image) *Image {
 	bounds := img.Bounds()
 	w := bounds.Dx()
