@@ -29,11 +29,18 @@ func (i *Image) Heigth() int {
 }
 
 func (i *Image) SubPixels() []byte {
+	w := i.rect.Dx()
+	h := i.rect.Dy()
+	// log.Println("w:", w, "h:", h, w*h)
 	ret := make([]byte, 0, 4*i.rect.Dx()*i.rect.Dy())
-	for x := 0; x < x+i.rect.Dx(); x++ {
-		for y := 0; y < y+i.rect.Dy(); y++ {
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			// log.Println("x:", x, "y:", y)
 			idx := i.GetIndex(x, y)
 			ret = append(ret, i.pixels[idx])
+			ret = append(ret, i.pixels[idx+1])
+			ret = append(ret, i.pixels[idx+2])
+			ret = append(ret, i.pixels[idx+3])
 		}
 	}
 	return ret
@@ -141,6 +148,7 @@ func NewImage(w, h int) *Image {
 //go:inline
 func (i *Image) GetIndex(x, y int) int {
 	index := i.indexRef + y*i.stride*4 + x*4
+	// log.Println("HERE3:", index)
 	return index
 
 }
