@@ -28,6 +28,16 @@ func (i *Image) Heigth() int {
 	return i.rect.Dy()
 }
 
+func (i *Image) SubPixels() []byte {
+	ret := make([]byte, 0, 4*i.rect.Dx()*i.rect.Dy())
+	for x := 0; x < x+i.rect.Dx(); x++ {
+		for y := 0; y < y+i.rect.Dy(); y++ {
+			ret = append(ret, byte(i.GetIndex(x, y)))
+		}
+	}
+	return ret
+}
+
 func (i *Image) Pixels() []byte {
 	return i.pixels
 }
