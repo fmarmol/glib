@@ -11,6 +11,7 @@ import (
 	"unsafe"
 
 	"github.com/disintegration/imaging"
+	"github.com/nfnt/resize"
 )
 
 type Image struct {
@@ -31,11 +32,9 @@ func (i *Image) Heigth() int {
 func (i *Image) SubPixels() []byte {
 	w := i.rect.Dx()
 	h := i.rect.Dy()
-	// log.Println("w:", w, "h:", h, w*h)
 	ret := make([]byte, 0, 4*i.rect.Dx()*i.rect.Dy())
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			// log.Println("x:", x, "y:", y)
 			idx := i.GetIndex(x, y)
 			ret = append(ret, i.pixels[idx])
 			ret = append(ret, i.pixels[idx+1])
@@ -55,25 +54,8 @@ func (i *Image) PixelsU32() []uint32 {
 }
 
 func (i *Image) Resize(nw, nh int) *Image {
-	w, h := i.rect.Dx(), i.rect.Dy()
-
-	newImg := NewImage(nw, nh)
-
-	for x := 0; x < nw; x++ {
-		for y := 0; y < nh; y++ {
-
-			xNorm := (float64(x) + 0.5) / float64(nw)
-			yNorm := (float64(y) + 0.5) / float64(nh)
-
-			xSource := int(xNorm * float64(w))
-			ySource := int(yNorm * float64(h))
-			cSource := i.At(xSource, ySource)
-
-			newImg.Set(x, y, cSource)
-
-		}
-	}
-	return newImg
+	res := resize.Resize(uint(nw), uint(nh), i, resize.Bicubic)
+	return NewImageFromImage(res)
 }
 
 func (i *Image) Scale(v float64) *Image {
